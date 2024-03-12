@@ -1,20 +1,31 @@
+
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
-import pyttsx3
 import asyncio
 from gtts import gTTS
-
+import ollama
 load_dotenv()
 
+#intents de discord bot
 intents = discord.Intents.all()
 intents.messages = True
 intents.guilds = True
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+# modelfile para predefinir ollama y la calidad de sus respuestas, Se puede usar cualquier modelo mientras este bien configurado el modelfile
+modelfile= '''
+FROM stablelm2
+SYSTEM speak the language that the question is made.
 
+'''
+ollama.create(model='ResumeModel', modelfile=modelfile)
+
+
+
+
+bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
@@ -48,5 +59,29 @@ async def tts(ctx, *, text):
     else:
         print("El archivo 'tts_output.wav' no existe.")
 
+@bot.command()
+async def leave(ctx):
+    if ctx.voice_client is not None:
+        await ctx.voice_client.disconnect()
+        await ctx.send("Bot desconectad")
+    else:
+        await ctx.send("Debo estar en un canal de voz para desconectarme")
+        
+@bot.command()
+async def llama(ctx,*,text):
+    messages = [{'role': 'user', 'content': f'{text}\n'}]
+    stream = ollama.chat(
+        model='ResumeModel',
+        messages=messages,
+        stream=True,
+    )
 
+
+    response_content = ''.join(chunk['message']['content'] for chunk in stream)
+    await ctx.send(response_content)
+    
+    
+# usar el token que provee el servicio de developers de discord
 bot.run(os.getenv('DISCORD_TOKEN'))
+
+

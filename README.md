@@ -17,9 +17,6 @@ pip install -r requirements.txt
 * Configura el bot en el portal de desarrolladores de Discord y obtén el token del bot.
 
 
-
-
-
 ## Uso 
 
 * Invita al bot a tu servidor de Discord.
@@ -30,14 +27,10 @@ pip install -r requirements.txt
 ```
 * Sustituye [texto] con el mensaje que deseas convertir.
 
-
-* Tambien se agrego una nueva opcion para usarlo de chatbot con ollama
-* De momento se pueden consultar cosas pero no es tan preciso en las respuestas como lo seria con openAI asi que queda a disposicion del usuario ajustarlo
-
+* Se le pueden consultar cosas al bot ya que usa gemini AI de google para generar las respuestas
 ```
-!llama [pregunta]
+!gemini [texto]
 ```
-* Con ese comando el bot empezara a trabajar para dar una respuesta en texto de lo que se quiera consultar
-
+* Con este comando se le puede consultar ciertas cosas, preguntas con insultos, que no sean especificas (tipo generar textos muy grandes) no las respondera por limitaciones del modelo gratuito de Google
 ## Contribuciones
 Si encuentras errores o tienes sugerencias, siéntete libre de abrir un problema o enviar una solicitud de extracción.

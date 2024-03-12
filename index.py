@@ -5,25 +5,20 @@ from dotenv import load_dotenv
 import os
 import asyncio
 from gtts import gTTS
-import ollama
+import google.generativeai as genai
+
 load_dotenv()
+
+#implementacion de gemini AI
+genai.configure(api_key=os.getenv("API_KEY"))
+model = genai.GenerativeModel('gemini-pro')
+
 
 #intents de discord bot
 intents = discord.Intents.all()
 intents.messages = True
 intents.guilds = True
 intents.members = True
-
-# modelfile para predefinir ollama y la calidad de sus respuestas, Se puede usar cualquier modelo mientras este bien configurado el modelfile
-modelfile= '''
-FROM stablelm2
-SYSTEM speak the language that the question is made.
-
-'''
-ollama.create(model='ResumeModel', modelfile=modelfile)
-
-
-
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
@@ -63,25 +58,24 @@ async def tts(ctx, *, text):
 async def leave(ctx):
     if ctx.voice_client is not None:
         await ctx.voice_client.disconnect()
-        await ctx.send("Bot desconectad")
+        await ctx.send("Bot desconectado")
     else:
         await ctx.send("Debo estar en un canal de voz para desconectarme")
-        
+
 @bot.command()
-async def llama(ctx,*,text):
-    messages = [{'role': 'user', 'content': f'{text}\n'}]
-    stream = ollama.chat(
-        model='ResumeModel',
-        messages=messages,
-        stream=True,
-    )
+async def gemini(ctx,*,text):
+    try:
 
+        if ctx.channel.name == 'consultas-gemini':
+            response = model.generate_content(text)
+            await ctx.send(response.text)
+            await asyncio.sleep(5)
+        else:
+            await ctx.send("Es mejor que uses otro canal para hacerme consultas")
+    except Exception as e:
+        print(f"Error en el comando gemini: {e}")
 
-    response_content = ''.join(chunk['message']['content'] for chunk in stream)
-    await ctx.send(response_content)
-    
-    
 # usar el token que provee el servicio de developers de discord
-bot.run(os.getenv('DISCORD_TOKEN'))
+bot.run(os.getenv("DISCORD_TOKEN"))
 
 
